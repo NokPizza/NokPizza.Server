@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/source/">
+    <Project Path="source/NokPizza.AppHost/NokPizza.AppHost.csproj" />
+    <Project Path="source/NokPizza.Server/NokPizza.Server.csproj" />
+  </Folder>
+</Solution>

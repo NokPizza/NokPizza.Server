@@ -1,0 +1,64 @@
+name: Pull Request Validation
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  formatting:
+    name: Validate formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET with caching
+        uses: ./.github/actions/setup-with-cache
+        with:
+          dotnet-version: "10"
+          cache-nuget: "false"
+          cache-tools: "true"
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet csharpier check .
+
+  spelling:
+    name: Validate spelling
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run cspell
+        uses: streetsidesoftware/cspell-action@v6
+
+  build:
+    name: Validate build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET with caching
+        uses: ./.github/actions/setup-with-cache
+        with:
+          dotnet-version: "10"
+          cache-nuget: "true"
+
+      - name: Restore dependencies
+        timeout-minutes: 5
+        run: dotnet restore
+
+      - name: Build
+        timeout-minutes: 10
+        run: dotnet build --no-restore
+
+      - name: Run tests
+        timeout-minutes: 15
+        run: dotnet test --no-build --verbosity normal

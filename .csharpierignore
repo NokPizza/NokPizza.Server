@@ -1,0 +1,3 @@
+**/Migrations/*.cs
+**/*.csproj
+Directory.Packages.props
