@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace NokPizza.Server.Database.Models;
 
+[Index(nameof(EndTime))]
 public class PizzaOrder
 {
     [Key]

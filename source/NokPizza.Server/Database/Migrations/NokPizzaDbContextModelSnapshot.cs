@@ -8,7 +8,7 @@ using NokPizza.Server.Database;
 
 #nullable disable
 
-namespace NokPizza.Server.Migrations
+namespace NokPizza.Server.Database.Migrations
 {
     [DbContext(typeof(NokPizzaDbContext))]
     partial class NokPizzaDbContextModelSnapshot : ModelSnapshot
@@ -95,6 +95,8 @@ namespace NokPizza.Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EndTime");
 
                     b.ToTable("PizzaOrders");
                 });

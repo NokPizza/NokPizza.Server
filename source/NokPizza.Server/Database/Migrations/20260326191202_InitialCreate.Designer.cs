@@ -9,10 +9,10 @@ using NokPizza.Server.Database;
 
 #nullable disable
 
-namespace NokPizza.Server.Migrations
+namespace NokPizza.Server.Database.Migrations
 {
     [DbContext(typeof(NokPizzaDbContext))]
-    [Migration("20260326142111_InitialCreate")]
+    [Migration("20260326191202_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -98,6 +98,8 @@ namespace NokPizza.Server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EndTime");
 
                     b.ToTable("PizzaOrders");
                 });

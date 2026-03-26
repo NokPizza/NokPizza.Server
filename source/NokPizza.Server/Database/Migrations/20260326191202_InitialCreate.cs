@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace NokPizza.Server.Migrations
+namespace NokPizza.Server.Database.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -83,6 +83,11 @@ namespace NokPizza.Server.Migrations
                 name: "IX_PizzaOrderConstraints_ConstraintId",
                 table: "PizzaOrderConstraints",
                 column: "ConstraintId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PizzaOrders_EndTime",
+                table: "PizzaOrders",
+                column: "EndTime");
         }
 
         /// <inheritdoc />
