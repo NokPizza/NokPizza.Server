@@ -5,8 +5,13 @@ namespace NokPizza.Server.Services.PizzaOrder;
 
 public interface IPizzaOrderService
 {
-    Task<Guid> CreateAsync(DateTime endTime);
-    Task<PizzaOrderResponse?> GetAsync(Guid id);
-    Task<PizzaOrderResponse?> AttendAsync(Guid orderId, IEnumerable<int> constraintIds);
-    Task<IEnumerable<DietaryConstraint>> GetConstraintsAsync();
+    Task<Guid> CreateAsync(DateTime endTime, CancellationToken cancellationToken);
+    Task<PizzaOrderResponse?> GetAsync(Guid id, CancellationToken cancellationToken);
+    Task<PizzaOrderResponse?> AttendAsync(
+        Guid orderId,
+        IEnumerable<int> constraintIds,
+        CancellationToken cancellationToken
+    );
+    Task<IEnumerable<DietaryConstraint>> GetConstraintsAsync(CancellationToken cancellationToken);
+    Task DeleteExpiredAsync(CancellationToken cancellationToken);
 }

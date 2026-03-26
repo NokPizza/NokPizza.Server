@@ -12,11 +12,14 @@ public partial class PizzaOrderController(
 ) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<Guid>> Create([FromBody] CreatePizzaOrderRequest request)
+    public async Task<ActionResult<Guid>> Create(
+        [FromBody] CreatePizzaOrderRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            var id = await service.CreateAsync(request.EndTime);
+            var id = await service.CreateAsync(request.EndTime, cancellationToken);
             logger.LogInformation("Created pizza order with ID {Id}", id);
 
             return CreatedAtAction(nameof(Create), new { id }, id);
@@ -29,11 +32,14 @@ public partial class PizzaOrderController(
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PizzaOrderResponse>> Get(Guid id)
+    public async Task<ActionResult<PizzaOrderResponse>> Get(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            var order = await service.GetAsync(id);
+            var order = await service.GetAsync(id, cancellationToken);
             if (order is null)
                 return NotFound();
 
@@ -49,12 +55,13 @@ public partial class PizzaOrderController(
     [HttpPost("{id}/attend")]
     public async Task<ActionResult<PizzaOrderResponse>> Attend(
         Guid id,
-        [FromBody] AttendRequest request
+        [FromBody] AttendRequest request,
+        CancellationToken cancellationToken = default
     )
     {
         try
         {
-            var order = await service.AttendAsync(id, request.ConstraintIds);
+            var order = await service.AttendAsync(id, request.ConstraintIds, cancellationToken);
             if (order is null)
                 return NotFound();
 

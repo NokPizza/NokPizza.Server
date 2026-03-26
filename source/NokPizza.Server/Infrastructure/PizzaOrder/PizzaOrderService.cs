@@ -7,33 +7,41 @@ using PizzaOrderModel = NokPizza.Server.Database.Models.PizzaOrder;
 
 namespace NokPizza.Server.Infrastructure.PizzaOrder;
 
-public class PizzaOrderService(NokPizzaDbContext dbContext) : IPizzaOrderService
+public class PizzaOrderService(NokPizzaDbContext dbContext, TimeProvider timeProvider)
+    : IPizzaOrderService
 {
-    public async Task<Guid> CreateAsync(DateTime endTime)
+    public async Task<Guid> CreateAsync(DateTime endTime, CancellationToken cancellationToken)
     {
         var order = new PizzaOrderModel { EndTime = endTime };
         dbContext.PizzaOrders.Add(order);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return order.Id;
     }
 
-    public async Task<PizzaOrderResponse?> GetAsync(Guid id)
+    public async Task<PizzaOrderResponse?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
         var order = await dbContext
             .PizzaOrders.Include(x => x.PizzaOrderConstraints)
                 .ThenInclude(x => x.DietaryConstraint)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(
+                x => x.Id == id && x.EndTime >= timeProvider.GetUtcNow().UtcDateTime,
+                cancellationToken
+            );
 
         return order is null ? null : MapToResponse(order);
     }
 
-    public async Task<PizzaOrderResponse?> AttendAsync(Guid orderId, IEnumerable<int> constraintIds)
+    public async Task<PizzaOrderResponse?> AttendAsync(
+        Guid orderId,
+        IEnumerable<int> constraintIds,
+        CancellationToken cancellationToken
+    )
     {
         var order = await dbContext
             .PizzaOrders.Include(x => x.PizzaOrderConstraints)
                 .ThenInclude(x => x.DietaryConstraint)
-            .FirstOrDefaultAsync(x => x.Id == orderId);
+            .FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
 
         if (order is null)
             return null;
@@ -59,12 +67,18 @@ public class PizzaOrderService(NokPizzaDbContext dbContext) : IPizzaOrderService
                 );
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         return MapToResponse(order);
     }
 
-    public async Task<IEnumerable<DietaryConstraint>> GetConstraintsAsync() =>
-        await dbContext.DietaryConstraints.ToListAsync();
+    public async Task<IEnumerable<DietaryConstraint>> GetConstraintsAsync(
+        CancellationToken cancellationToken
+    ) => await dbContext.DietaryConstraints.ToListAsync(cancellationToken);
+
+    public async Task DeleteExpiredAsync(CancellationToken cancellationToken = default) =>
+        await dbContext
+            .PizzaOrders.Where(o => o.EndTime < timeProvider.GetUtcNow().UtcDateTime)
+            .ExecuteDeleteAsync(cancellationToken);
 
     private static PizzaOrderResponse MapToResponse(PizzaOrderModel order) =>
         new(

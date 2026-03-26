@@ -12,11 +12,13 @@ public class DietaryConstraintController(
 ) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DietaryConstraint>>> GetAll()
+    public async Task<ActionResult<IEnumerable<DietaryConstraint>>> GetAllConstraints(
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            return Ok(await service.GetConstraintsAsync());
+            return Ok(await service.GetConstraintsAsync(cancellationToken));
         }
         catch (Exception ex)
         {
