@@ -5,9 +5,10 @@ namespace NokPizza.Server.Database;
 
 public class NokPizzaDbContext(DbContextOptions options) : DbContext(options)
 {
-    public DbSet<PizzaOrder> PizzaOrders => Set<PizzaOrder>();
-    public DbSet<DietaryConstraint> DietaryConstraints => Set<DietaryConstraint>();
-    public DbSet<PizzaOrderConstraints> PizzaOrderConstraints => Set<PizzaOrderConstraints>();
+    public DbSet<PizzaOrderModel> PizzaOrders => Set<PizzaOrderModel>();
+    public DbSet<DietaryConstraintModel> DietaryConstraints => Set<DietaryConstraintModel>();
+    public DbSet<PizzaOrderConstraintsModel> PizzaOrderConstraints =>
+        Set<PizzaOrderConstraintsModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

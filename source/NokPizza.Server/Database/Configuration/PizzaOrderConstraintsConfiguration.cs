@@ -4,9 +4,10 @@ using NokPizza.Server.Database.Models;
 
 namespace NokPizza.Server.Database.Configuration;
 
-public class PizzaOrderConstraintsConfiguration : IEntityTypeConfiguration<PizzaOrderConstraints>
+public class PizzaOrderConstraintsConfiguration
+    : IEntityTypeConfiguration<PizzaOrderConstraintsModel>
 {
-    public void Configure(EntityTypeBuilder<PizzaOrderConstraints> builder)
+    public void Configure(EntityTypeBuilder<PizzaOrderConstraintsModel> builder)
     {
         // Composite primary key
         builder.HasKey(x => new { x.PizzaOrderId, x.ConstraintId });
