@@ -37,40 +37,16 @@ public class PizzaOrderService(NokPizzaDbContext dbContext, TimeProvider timePro
         CancellationToken cancellationToken
     )
     {
-        var order = await dbContext
-            .PizzaOrders.Include(x => x.PizzaOrderConstraints)
-                .ThenInclude(x => x.DietaryConstraint)
-            .FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
-
+        var order = await GetActiveOrderAsync(orderId, cancellationToken);
         if (order is null)
         {
             return null;
         }
 
-        order.NumberOfPeople++;
+        var requestedConstraintIds = constraintIds.ToArray();
+        var constraintsById = await GetConstraintsByIdAsync(requestedConstraintIds, cancellationToken);
 
-        foreach (var constraintId in constraintIds)
-        {
-            var existing = order.PizzaOrderConstraints.FirstOrDefault(x =>
-                x.ConstraintId == constraintId
-            );
-
-            if (existing is not null)
-            {
-                existing.Count++;
-            }
-            else
-            {
-                order.PizzaOrderConstraints.Add(
-                    new PizzaOrderConstraintsModel
-                    {
-                        PizzaOrderId = orderId,
-                        ConstraintId = constraintId,
-                        Count = 1,
-                    }
-                );
-            }
-        }
+        ApplyAttendance(order, requestedConstraintIds, constraintsById);
 
         await dbContext.SaveChangesAsync(cancellationToken);
         return MapToResponse(order);
@@ -84,6 +60,64 @@ public class PizzaOrderService(NokPizzaDbContext dbContext, TimeProvider timePro
         await dbContext
             .PizzaOrders.Where(o => o.EndTime < timeProvider.GetUtcNow().UtcDateTime)
             .ExecuteDeleteAsync(cancellationToken);
+
+    private async Task<PizzaOrderModel?> GetActiveOrderAsync(
+        Guid orderId,
+        CancellationToken cancellationToken
+    )
+    {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+
+        return await dbContext
+            .PizzaOrders.Include(x => x.PizzaOrderConstraints)
+                .ThenInclude(x => x.DietaryConstraint)
+            .FirstOrDefaultAsync(x => x.Id == orderId && x.EndTime >= now, cancellationToken);
+    }
+
+    private async Task<Dictionary<int, DietaryConstraintModel>> GetConstraintsByIdAsync(
+        int[] constraintIds,
+        CancellationToken cancellationToken
+    ) =>
+        await dbContext
+            .DietaryConstraints.Where(x => constraintIds.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, cancellationToken);
+
+    private static void ApplyAttendance(
+        PizzaOrderModel order,
+        IEnumerable<int> constraintIds,
+        IReadOnlyDictionary<int, DietaryConstraintModel> constraintsById
+    )
+    {
+        order.NumberOfPeople++;
+
+        foreach (var constraintId in constraintIds)
+        {
+            var existing = order.PizzaOrderConstraints.FirstOrDefault(x =>
+                x.ConstraintId == constraintId
+            );
+
+            if (existing is not null)
+            {
+                existing.Count++;
+                continue;
+            }
+
+            if (!constraintsById.TryGetValue(constraintId, out var dietaryConstraint))
+            {
+                continue;
+            }
+
+            order.PizzaOrderConstraints.Add(
+                new PizzaOrderConstraintsModel
+                {
+                    PizzaOrderId = order.Id,
+                    ConstraintId = constraintId,
+                    DietaryConstraint = dietaryConstraint,
+                    Count = 1,
+                }
+            );
+        }
+    }
 
     private static PizzaOrderResponseDto MapToResponse(PizzaOrderModel order) =>
         new(

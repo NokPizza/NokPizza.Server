@@ -154,6 +154,29 @@ public class PizzaOrderServiceTests
     }
 
     [Fact]
+    public async Task AttendAsync_Returns_Null_For_Expired_Order()
+    {
+        SetUtcNow(new DateTime(2026, 03, 27, 12, 00, 00, DateTimeKind.Utc));
+
+        _dbContext.DietaryConstraints.Add(new DietaryConstraintModel { Id = 1, Name = "Vegan" });
+
+        var order = new PizzaOrderModel
+        {
+            EndTime = new DateTime(2026, 03, 27, 11, 00, 00, DateTimeKind.Utc),
+            NumberOfPeople = 1,
+        };
+        _dbContext.PizzaOrders.Add(order);
+        await _dbContext.SaveChangesAsync();
+
+        var result = await _service.AttendAsync(order.Id, [1], CancellationToken.None);
+
+        result.ShouldBeNull();
+
+        var savedOrder = await _dbContext.PizzaOrders.SingleAsync(x => x.Id == order.Id);
+        savedOrder.NumberOfPeople.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task GetConstraintsAsync_Returns_All_Constraints()
     {
         SetUtcNow(new DateTime(2026, 03, 27, 12, 00, 00, DateTimeKind.Utc));
