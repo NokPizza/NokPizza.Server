@@ -1,0 +1,39 @@
+name: Setup .NET with caching
+description: Sets up .NET and optionally caches NuGet packages and tools
+
+inputs:
+  dotnet-version:
+    description: The .NET version to install
+    required: true
+  cache-nuget:
+    description: Whether to cache NuGet packages
+    required: false
+    default: "true"
+  cache-tools:
+    description: Whether to cache .NET tools
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Cache NuGet packages
+      if: inputs.cache-nuget == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: nuget-${{ runner.os }}-
+
+    - name: Cache .NET tools
+      if: inputs.cache-tools == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.dotnet/tools
+        key: dotnet-tools-${{ runner.os }}-${{ hashFiles('.config/dotnet-tools.json') }}
+        restore-keys: dotnet-tools-${{ runner.os }}-
