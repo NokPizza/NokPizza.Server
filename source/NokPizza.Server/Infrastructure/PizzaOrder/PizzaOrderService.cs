@@ -44,7 +44,10 @@ public class PizzaOrderService(NokPizzaDbContext dbContext, TimeProvider timePro
         }
 
         var requestedConstraintIds = constraintIds.ToArray();
-        var constraintsById = await GetConstraintsByIdAsync(requestedConstraintIds, cancellationToken);
+        var constraintsById = await GetConstraintsByIdAsync(
+            requestedConstraintIds,
+            cancellationToken
+        );
 
         ApplyAttendance(order, requestedConstraintIds, constraintsById);
 
