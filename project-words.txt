@@ -1,4 +1,10 @@
 ASPNETCORE
+appsettings
+Entra
+datareader
+datawriter
+ddladmin
+SQLCONNSTR
 OPTOUT
 AZUREAPPSERVICE
 SUBSCRIPTIONID7
