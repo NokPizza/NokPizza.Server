@@ -9,8 +9,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<NokPizzaDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("nok-pizza-db")
-            ?? throw new InvalidOperationException("Connection string 'nok-pizza-db' not found")
+        DatabaseConnectionStringResolver.GetRequiredConnectionString(builder.Configuration)
     )
 );
 
