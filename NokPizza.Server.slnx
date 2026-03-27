@@ -3,4 +3,7 @@
     <Project Path="source/NokPizza.AppHost/NokPizza.AppHost.csproj" />
     <Project Path="source/NokPizza.Server/NokPizza.Server.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NokPizza.Server.Tests/NokPizza.Server.Tests.csproj" />
+  </Folder>
 </Solution>
