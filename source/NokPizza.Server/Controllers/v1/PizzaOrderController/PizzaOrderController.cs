@@ -6,10 +6,8 @@ namespace NokPizza.Server.Controllers.v1.PizzaOrderController;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public partial class PizzaOrderController(
-    IPizzaOrderService service,
-    ILogger<PizzaOrderController> logger
-) : ControllerBase
+public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrderController> logger)
+    : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
@@ -41,7 +39,9 @@ public partial class PizzaOrderController(
         {
             var order = await service.GetAsync(id, cancellationToken);
             if (order is null)
+            {
                 return NotFound();
+            }
 
             return order;
         }
@@ -63,7 +63,9 @@ public partial class PizzaOrderController(
         {
             var order = await service.AttendAsync(id, request.ConstraintIds, cancellationToken);
             if (order is null)
+            {
                 return NotFound();
+            }
 
             return order;
         }
