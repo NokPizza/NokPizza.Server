@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/NokPizza/NokPizza.Server/compare/v1.0.0...v1.0.1) (2026-03-27)
+
+
+### Bug Fixes
+
+* add api docs in prod ([#6](https://github.com/NokPizza/NokPizza.Server/issues/6)) ([13108ef](https://github.com/NokPizza/NokPizza.Server/commit/13108ef496ca9e96132df317370d7f7964380c2e))
+
 ## 1.0.0 (2026-03-27)
 
 
