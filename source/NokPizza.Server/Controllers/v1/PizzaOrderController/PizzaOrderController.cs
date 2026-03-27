@@ -11,7 +11,7 @@ public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrder
 {
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
-        [FromBody] CreatePizzaOrderRequest request,
+        [FromBody] CreatePizzaOrderRequestDto request,
         CancellationToken cancellationToken = default
     )
     {
@@ -20,7 +20,7 @@ public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrder
             var id = await service.CreateAsync(request.EndTime, cancellationToken);
             logger.LogInformation("Created pizza order with ID {Id}", id);
 
-            return CreatedAtAction(nameof(Create), new { id }, id);
+            return CreatedAtAction(nameof(Get), new { id }, id);
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrder
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PizzaOrderResponse>> Get(
+    public async Task<ActionResult<PizzaOrderResponseDto>> Get(
         Guid id,
         CancellationToken cancellationToken = default
     )
@@ -53,9 +53,9 @@ public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrder
     }
 
     [HttpPost("{id}/attend")]
-    public async Task<ActionResult<PizzaOrderResponse>> Attend(
+    public async Task<ActionResult<PizzaOrderResponseDto>> Attend(
         Guid id,
-        [FromBody] AttendRequest request,
+        [FromBody] AttendRequestDto request,
         CancellationToken cancellationToken = default
     )
     {

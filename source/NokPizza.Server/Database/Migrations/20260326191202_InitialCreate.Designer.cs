@@ -25,7 +25,7 @@ namespace NokPizza.Server.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("NokPizza.Server.Database.Models.DietaryConstraint", b =>
+            modelBuilder.Entity("NokPizza.Server.Database.Models.DietaryConstraintModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +85,7 @@ namespace NokPizza.Server.Database.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrder", b =>
+            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,7 +104,7 @@ namespace NokPizza.Server.Database.Migrations
                     b.ToTable("PizzaOrders");
                 });
 
-            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderConstraints", b =>
+            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderConstraintsModel", b =>
                 {
                     b.Property<Guid>("PizzaOrderId")
                         .HasColumnType("uniqueidentifier");
@@ -122,15 +122,15 @@ namespace NokPizza.Server.Database.Migrations
                     b.ToTable("PizzaOrderConstraints");
                 });
 
-            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderConstraints", b =>
+            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderConstraintsModel", b =>
                 {
-                    b.HasOne("NokPizza.Server.Database.Models.DietaryConstraint", "DietaryConstraint")
+                    b.HasOne("NokPizza.Server.Database.Models.DietaryConstraintModel", "DietaryConstraint")
                         .WithMany()
                         .HasForeignKey("ConstraintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NokPizza.Server.Database.Models.PizzaOrder", "PizzaOrder")
+                    b.HasOne("NokPizza.Server.Database.Models.PizzaOrderModel", "PizzaOrder")
                         .WithMany("PizzaOrderConstraints")
                         .HasForeignKey("PizzaOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -141,7 +141,7 @@ namespace NokPizza.Server.Database.Migrations
                     b.Navigation("PizzaOrder");
                 });
 
-            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrder", b =>
+            modelBuilder.Entity("NokPizza.Server.Database.Models.PizzaOrderModel", b =>
                 {
                     b.Navigation("PizzaOrderConstraints");
                 });

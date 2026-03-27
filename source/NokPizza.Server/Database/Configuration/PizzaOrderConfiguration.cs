@@ -4,9 +4,9 @@ using NokPizza.Server.Database.Models;
 
 namespace NokPizza.Server.Database.Configuration;
 
-public class PizzaOrderConfiguration : IEntityTypeConfiguration<PizzaOrder>
+public class PizzaOrderConfiguration : IEntityTypeConfiguration<PizzaOrderModel>
 {
-    public void Configure(EntityTypeBuilder<PizzaOrder> builder) =>
+    public void Configure(EntityTypeBuilder<PizzaOrderModel> builder) =>
         builder
             .HasMany(x => x.PizzaOrderConstraints)
             .WithOne(x => x.PizzaOrder)

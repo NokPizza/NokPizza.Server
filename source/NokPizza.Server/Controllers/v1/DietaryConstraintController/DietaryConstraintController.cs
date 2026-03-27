@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NokPizza.Server.Database.Models;
+using NokPizza.Server.Infrastructure.Dto;
 using NokPizza.Server.Services.PizzaOrder;
 
 namespace NokPizza.Server.Controllers.v1.DietaryConstraintController;
@@ -12,13 +12,16 @@ public class DietaryConstraintController(
 ) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DietaryConstraint>>> GetAllConstraints(
+    public async Task<ActionResult<IEnumerable<DietaryConstraintResponseDto>>> GetAllConstraints(
         CancellationToken cancellationToken = default
     )
     {
         try
         {
-            return Ok(await service.GetConstraintsAsync(cancellationToken));
+            var constraints = await service.GetConstraintsAsync(cancellationToken);
+            var response = constraints.Select(x => new DietaryConstraintResponseDto(x.Id, x.Name));
+
+            return Ok(response);
         }
         catch (Exception ex)
         {

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NokPizza.Server.Database.Models;
 
-public class DietaryConstraint
+public class DietaryConstraintModel
 {
     [Key]
     public int Id { get; set; }
