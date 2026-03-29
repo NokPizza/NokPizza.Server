@@ -4,6 +4,10 @@ using NokPizza.Server.Services.PizzaOrder;
 
 namespace NokPizza.Server.Controllers.v1.PizzaOrderController;
 
+/// <summary>
+/// Controller for managing pizza orders.
+/// </summary>
+/// <param name="service">The pizza order service.</param>
 [ApiController]
 [Route("api/v1/[controller]")]
 public class PizzaOrderController(IPizzaOrderService service) : ControllerBase
