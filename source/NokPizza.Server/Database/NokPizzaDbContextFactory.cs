@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace NokPizza.Server.Database;
 
@@ -8,13 +9,17 @@ public class NokPizzaDbContextFactory : IDesignTimeDbContextFactory<NokPizzaDbCo
 {
     public NokPizzaDbContext CreateDbContext(string[] args)
     {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        var environment =
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? Environments.Development;
         var basePath = ResolveBasePath();
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)
             .AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{environment}.json", optional: true)
+            .AddUserSecrets(typeof(NokPizzaDbContextFactory).Assembly, optional: true)
             .AddEnvironmentVariables()
             .Build();
 

@@ -7,8 +7,10 @@ public class NokPizzaDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<PizzaOrderModel> PizzaOrders => Set<PizzaOrderModel>();
     public DbSet<DietaryConstraintModel> DietaryConstraints => Set<DietaryConstraintModel>();
-    public DbSet<PizzaOrderConstraintsModel> PizzaOrderConstraints =>
-        Set<PizzaOrderConstraintsModel>();
+    public DbSet<PizzaOrderParticipantModel> PizzaOrderParticipants =>
+        Set<PizzaOrderParticipantModel>();
+    public DbSet<PizzaOrderParticipantConstraintModel> PizzaOrderParticipantConstraints =>
+        Set<PizzaOrderParticipantConstraintModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

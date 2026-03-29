@@ -1,78 +1,79 @@
 using Microsoft.AspNetCore.Mvc;
-using NokPizza.Server.Infrastructure.Dto;
+using NokPizza.Server.Infrastructure.Dto.PizzaOrder;
 using NokPizza.Server.Services.PizzaOrder;
 
 namespace NokPizza.Server.Controllers.v1.PizzaOrderController;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class PizzaOrderController(IPizzaOrderService service, ILogger<PizzaOrderController> logger)
-    : ControllerBase
+public class PizzaOrderController(IPizzaOrderService service) : ControllerBase
 {
+    /// <summary>
+    /// Creates a new pizza order with the specified details. The admin password is required to create the order, and the RSVP deadline must be before or equal to the end time.
+    /// </summary>
+    /// <param name="request">The request containing the pizza order details.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The ID of the created pizza order.</returns>
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
         [FromBody] CreatePizzaOrderRequestDto request,
         CancellationToken cancellationToken = default
     )
     {
-        try
+        if (string.IsNullOrWhiteSpace(request.AdminPassword))
         {
-            var id = await service.CreateAsync(request.EndTime, cancellationToken);
-            logger.LogInformation("Created pizza order with ID {Id}", id);
+            return BadRequest("Admin password is required.");
+        }
 
-            return CreatedAtAction(nameof(Get), new { id }, id);
-        }
-        catch (Exception ex)
+        if (request.RsvpDeadline > request.EndTime)
         {
-            logger.LogError(ex, "Failed to create pizza order");
-            return StatusCode(500, "Failed to create pizza order.");
+            return BadRequest("RSVP deadline must be before or equal to end time.");
         }
+
+        var id = await service.CreateAsync(request, cancellationToken);
+
+        return CreatedAtAction(nameof(Get), new { id }, id);
     }
 
+    /// <summary>
+    /// Gets the details of a pizza order by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the pizza order.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The details of the pizza order.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<PizzaOrderResponseDto>> Get(
         Guid id,
         CancellationToken cancellationToken = default
     )
     {
-        try
+        var order = await service.GetAsync(id, cancellationToken);
+        if (order is null)
         {
-            var order = await service.GetAsync(id, cancellationToken);
-            if (order is null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
 
-            return order;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve pizza order {Id}", id);
-            return StatusCode(500, "Failed to retrieve pizza order.");
-        }
+        return order;
     }
 
-    [HttpPost("{id}/attend")]
-    public async Task<ActionResult<PizzaOrderResponseDto>> Attend(
-        Guid id,
-        [FromBody] AttendRequestDto request,
+    /// <summary>
+    /// Finds pizza orders by email. This will return all pizza orders where the specified email is.
+    /// </summary>
+    /// <param name="email">The email to search for.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The list of matching pizza orders.</returns>
+    [HttpPost("search")]
+    public async Task<ActionResult<IEnumerable<PizzaOrderLookupResponseDto>>> Search(
+        [FromBody] string email,
         CancellationToken cancellationToken = default
     )
     {
-        try
+        if (string.IsNullOrWhiteSpace(email))
         {
-            var order = await service.AttendAsync(id, request.ConstraintIds, cancellationToken);
-            if (order is null)
-            {
-                return NotFound();
-            }
+            return BadRequest("Email is required.");
+        }
 
-            return order;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to attend pizza order {Id}", id);
-            return StatusCode(500, "Failed to attend pizza order.");
-        }
+        var orders = await service.FindByEmailAsync(email, cancellationToken);
+        return Ok(orders);
     }
 }

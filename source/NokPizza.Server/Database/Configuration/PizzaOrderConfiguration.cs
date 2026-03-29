@@ -8,7 +8,7 @@ public class PizzaOrderConfiguration : IEntityTypeConfiguration<PizzaOrderModel>
 {
     public void Configure(EntityTypeBuilder<PizzaOrderModel> builder) =>
         builder
-            .HasMany(x => x.PizzaOrderConstraints)
+            .HasMany(x => x.PizzaOrderParticipants)
             .WithOne(x => x.PizzaOrder)
             .HasForeignKey(x => x.PizzaOrderId)
             .OnDelete(DeleteBehavior.Cascade);
