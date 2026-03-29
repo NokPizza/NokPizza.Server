@@ -63,21 +63,21 @@ public class PizzaOrderController(IPizzaOrderService service) : ControllerBase
     /// <summary>
     /// Finds pizza orders by email. This will return all pizza orders where the specified email is.
     /// </summary>
-    /// <param name="email">The email to search for.</param>
+    /// <param name="request">The request containing the email to search for.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The list of matching pizza orders.</returns>
     [HttpPost("search")]
     public async Task<ActionResult<IEnumerable<PizzaOrderLookupResponseDto>>> Search(
-        [FromBody] string email,
+        [FromBody] SearchPizzaOrdersRequestDto request,
         CancellationToken cancellationToken = default
     )
     {
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(request.Email))
         {
             return BadRequest("Email is required.");
         }
 
-        var orders = await service.FindByEmailAsync(email, cancellationToken);
+        var orders = await service.FindByEmailAsync(request.Email, cancellationToken);
         return Ok(orders);
     }
 }
